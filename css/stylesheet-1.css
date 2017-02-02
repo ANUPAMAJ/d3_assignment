@@ -1,0 +1,12 @@
+svg{
+		margin-right: auto;
+		margin-left: auto;
+		display: block;
+	}
+
+.axis path,
+.axis line{
+		  fill: none;
+		  stroke: #000;
+		  shape-rendering: crispEdges;
+	}

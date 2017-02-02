@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="css/stylesheet-2.css">
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+</head>
+<body>
+<h1>For the year 2013, plot the all the Foodgrains type vs. production, in descending order</h1>
+<script>
+
+var margin = {top: 50, right: 10, bottom: 350, left: 40},
+    width = 1000 - margin.left - margin.right,
+    height = 800 - margin.top - margin.bottom;
+
+var svg = d3.select("body")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var xScale = d3.scale.ordinal().rangeRoundBands([0, width], 0.2);
+
+var yScale = d3.scale.linear().range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    		.scale(xScale)
+    		.orient("bottom")
+var yAxis = d3.svg.axis()
+    		.scale(yScale)
+    		.orient("left")
+
+d3.json("data-2.json", function(error, data) 
+{
+	if (error) {
+		console.log("error data not loaded");
+	}	 
+    data.forEach(function(d) {
+        d.production = +d.production;
+        d.particulars = d.particulars;
+		});
+  xScale.domain(data.map(function(d){return d.particulars}));
+ 	yScale.domain([0, d3.max(data, function(d) { return d.production; })]);
+
+  svg.selectAll("rect")
+      .data(data)
+      .enter()
+      .append("rect")
+      .attr("height", 0)
+      .attr("y", height)
+      .transition().duration(3000)
+      .delay(function(d,i){ return i + 200;})
+      .style("fill", "steelblue")
+      .attr("x", function(d) { return xScale(d.particulars); })
+      .attr("width", xScale.rangeBand())
+      .attr("y", function(d) { return yScale(d.production); })
+      .attr("height", function(d) { return height - yScale(d.production); })
+      .style("fill", function(d,i){ return "rgb(20, 20, " + ((i * 30) + 100) + ")"});
+      
+
+    svg.selectAll("text")
+    	.data(data)
+    	.enter()
+    	.append("text")
+    	.text(function(d){return d.production;})
+    	.attr("x", function(d){return xScale(d.particulars) + xScale.rangeBand()/2;})
+    	.attr("y", function(d){return yScale(d.production) -1;})
+    	.style("fill", "black")
+    	.style("text-anchor", "middle")
+    	.style("font-size", "12px");
+
+    svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+      .selectAll("text")
+      .attr("transform", "rotate(-90)" )
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", "-.25em")
+      .style("font-size", "13px");
+
+  	svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis);
+});
+</script>
+</body>
